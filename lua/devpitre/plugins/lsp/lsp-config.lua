@@ -85,47 +85,12 @@ return {
 					capabilities = capabilities,
 				})
 			end,
-			-- ["svelte"] = function()
-			--   -- configure svelte server
-			--   lspconfig["svelte"].setup({
-			--     capabilities = capabilities,
-			--     on_attach = function(client, bufnr)
-			--       vim.api.nvim_create_autocmd("BufWritePost", {
-			--         pattern = { "*.js", "*.ts" },
-			--         callback = function(ctx)
-			--           -- Here use ctx.match instead of ctx.file
-			--           client.notify("$/onDidChangeTsOrJsFile", { uri = ctx.match })
-			--         end,
-			--       })
-			--     end,
-			--   })
-			-- end,
 			["ts_ls"] = function()
 				-- configure typescript server
 				lspconfig["ts_ls"].setup({
 					capabilities = capabilities,
 					on_attach = function(client, bufnr)
 						-- enable typescript language server to organize imports
-
-						keymap.set(
-							"n",
-							"<leader>To",
-							"<cmd>TypescriptOrganizeImports<cr>",
-							{ desc = "Typescript Organize Imports" }
-						)
-						keymap.set(
-							"n",
-							"<leader>Tu",
-							"<cmd>TypescriptRemoveUnused<cr>",
-							{ desc = "Typescript Remove Unused Imports" }
-						)
-						keymap.set(
-							"n",
-							"<leader>Ta",
-							"<cmd>TypescriptAddMissingImports<cr>",
-							{ desc = "Typescript Add missing  Imports" }
-						)
-						keymap.set("n", "<leader>Tf", "<cmd>TypescriptRenameFile<cr>", { desc = "Rename File" })
 					end,
 				})
 			end,
