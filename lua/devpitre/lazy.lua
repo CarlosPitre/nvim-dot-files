@@ -24,4 +24,4 @@ require("lazy").setup(
 	}
 )
 
-vim.cmd([[colorscheme tokyodark]])
+vim.cmd([[colorscheme onedark]])
