@@ -18,6 +18,10 @@ return {
 
 		local keymap = vim.keymap -- for conciseness
 
+		local capabilities = cmp_nvim_lsp.default_capabilities()
+		capabilities = require("cmp_nvim_lsp").default_capabilities(capabilities)
+		local signs = { Error = " ", Warn = " ", Hint = "󰠠 ", Info = " " }
+
 		vim.api.nvim_create_autocmd("LspAttach", {
 			group = vim.api.nvim_create_augroup("UserLspConfig", {}),
 			callback = function(ev)
@@ -67,72 +71,133 @@ return {
 			end,
 		})
 
-		-- used to enable autocompletion (assign to every lsp server config)
-		local capabilities = cmp_nvim_lsp.default_capabilities()
-
-		-- Change the Diagnostic symbols in the sign column (gutter)
-		-- (not in youtube nvim video)
-		local signs = { Error = " ", Warn = " ", Hint = "󰠠 ", Info = " " }
 		for type, icon in pairs(signs) do
 			local hl = "DiagnosticSign" .. type
 			vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
 		end
 
-		mason_lspconfig.setup_handlers({
-			-- default handler for installed servers
-			function(server_name)
-				lspconfig[server_name].setup({
-					capabilities = capabilities,
-				})
-			end,
-			["ts_ls"] = function()
-				-- configure typescript server
-				lspconfig["ts_ls"].setup({
-					capabilities = capabilities,
-					on_attach = function(client, bufnr)
-						-- enable typescript language server to organize imports
-					end,
-				})
-			end,
-			["graphql"] = function()
-				-- configure graphql language server
-				lspconfig["graphql"].setup({
-					capabilities = capabilities,
-					filetypes = { "graphql", "gql", "svelte", "typescriptreact", "javascriptreact" },
-				})
-			end,
-			["emmet_ls"] = function()
-				-- configure emmet language server
-				lspconfig["emmet_ls"].setup({
-					capabilities = capabilities,
-					filetypes = {
-						"html",
-						"typescriptreact",
-						"javascriptreact",
-						"css",
-						"sass",
-						"scss",
-						"less",
+		mason_lspconfig.setup({
+			-- ensure these servers are installed
+			ensure_installed = {
+				"ts_ls", -- typescript language server
+				"graphql", -- graphql language server
+				"emmet_ls", -- emmet language server
+				"lua_ls", -- lua language server
+				"jsonls", -- json language server
+				"cssls", -- css language server
+				"html", -- html language server
+				"tailwindcss", -- tailwind css language server
+				"rust_analyzer", -- rust language server
+				"pyright", -- python language server
+				"prismals", -- prisma language server
+				"graphql", -- graphql language server
+				"dockerls", -- docker language server
+				"bashls", -- bash language server
+				"yamlls", -- yaml language server
+				"marksman", -- markdown language server
+			},
+			-- auto-install configured servers on startup
+			automatic_installation = true,
+		})
+
+		lspconfig["ts_ls"].setup({
+			capabilities = capabilities,
+			filetypes = { "typescript", "typescriptreact", "typescript.tsx" },
+			root_dir = lspconfig.util.root_pattern("package.json", "tsconfig.json", "jsconfig.json", ".git"),
+		})
+
+		-- setup lspconfig with capabilities
+		lspconfig["lua_ls"].setup({
+			capabilities = capabilities,
+			settings = {
+				Lua = {
+					diagnostics = {
+						globals = { "vim" }, -- make the language server recognize "vim" global
 					},
-				})
-			end,
-			["lua_ls"] = function()
-				-- configure lua server (with special settings)
-				lspconfig["lua_ls"].setup({
-					capabilities = capabilities,
-					settings = {
-						Lua = {
-							-- make the language server recognize "vim" global
-							diagnostics = {
-								globals = { "vim" },
-							},
-							completion = {
-								callSnippet = "Replace",
-							},
-						},
+					completion = {
+						callSnippet = "Replace", -- use "Replace" for snippet completion
 					},
-				})
-			end,
+				},
+			},
+		})
+
+		lspconfig["cssls"].setup({
+			capabilities = capabilities,
+			filetypes = { "css", "scss", "less" },
+		})
+
+		lspconfig["html"].setup({
+			capabilities = capabilities,
+			filetypes = { "html", "htmldjango" },
+			init_options = {
+				provideFormatter = true,
+			},
+		})
+
+		lspconfig["tailwindcss"].setup({
+			capabilities = capabilities,
+			filetypes = { "html", "css", "javascript", "typescript", "javascriptreact", "typescriptreact" },
+			init_options = {
+				userLanguages = {
+					typescriptreact = "javascript",
+					javascriptreact = "javascript",
+				},
+			},
+		})
+
+		lspconfig["emmet_ls"].setup({
+			capabilities = capabilities,
+			filetypes = { "html", "css", "javascript", "typescript", "javascriptreact", "typescriptreact" },
+			init_options = {
+				html = {
+					options = {
+						["bem.enabled"] = true, -- enable BEM support
+					},
+				},
+			},
+		})
+
+		lspconfig["pyright"].setup({
+			capabilities = capabilities,
+			filetypes = { "python" },
+			root_dir = lspconfig.util.root_pattern(
+				"pyproject.toml",
+				"setup.py",
+				"setup.cfg",
+				"requirements.txt",
+				".git"
+			),
+		})
+
+		lspconfig["prismals"].setup({
+			capabilities = capabilities,
+			filetypes = { "prisma" },
+			root_dir = lspconfig.util.root_pattern("schema.prisma", ".git"),
+		})
+
+		lspconfig["dockerls"].setup({
+			capabilities = capabilities,
+			filetypes = { "dockerfile" },
+			root_dir = lspconfig.util.root_pattern("Dockerfile", ".git"),
+		})
+
+		lspconfig["bashls"].setup({
+			capabilities = capabilities,
+			filetypes = { "sh", "bash" },
+			root_dir = lspconfig.util.root_pattern(".bashrc", ".bash_profile", ".git"),
+		})
+
+		lspconfig["marksman"].setup({
+			capabilities = capabilities,
+			filetypes = { "markdown" },
+			root_dir = lspconfig.util.root_pattern(".git"),
+		})
+
+		-- setup lspconfig for other servers
+		lspconfig["graphql"].setup({
+			capabilities = capabilities,
+			filetypes = { "graphql", "typescriptreact", "typescript.tsx" },
+			root_dir = lspconfig.util.root_pattern("package.json", ".git"),
 		})
 	end,
 }
