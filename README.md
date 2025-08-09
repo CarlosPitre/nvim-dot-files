@@ -128,6 +128,9 @@ La primera vez que inicies Neovim, se instalarán automáticamente todos los plu
 - `<C-e>` - Cerrar autocompletado
 - `<CR>` - Confirmar selección
 
+### Avante
+- `<leader>aa` - Abrir la ventana de Avante
+
 ## 🔧 Plugins Principales
 
 ### Navegación y Búsqueda
